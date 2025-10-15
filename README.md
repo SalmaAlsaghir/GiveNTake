@@ -10,11 +10,11 @@ A vibrant, student-friendly marketplace for NYU Abu Dhabi students. Buy, sell, a
 
 ---
 
-## � Live Demo
+## 🌐 Live Demo
 
-**🚀 [View Live Site](https://your-deployment-url.vercel.app)** *(Coming Soon)*
+**🚀 [View Live Site](https://giventake3.me)**
 
-> *Note: Add your deployment URL here after deploying to Vercel/Render*
+> Built and deployed for NYU Vibe Coding Hackathon 2025 - Launch Track
 
 ---
 

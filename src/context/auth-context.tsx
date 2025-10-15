@@ -26,7 +26,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const fetchProfile = async (userId: string) => {
+  // Safety timeout to prevent infinite loading
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      if (loading) {
+        console.warn('Auth loading timeout - forcing loading to false');
+        setLoading(false);
+      }
+    }, 5000); // 5 second timeout
+
+    return () => clearTimeout(timeout);
+  }, [loading]);
+
+  const fetchProfile = async (userId: string) {
     try {
       console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
@@ -107,11 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error('Error getting initial session:', error);
-      setUser(null);
+        setUser(null);
         setProfile(null);
         setIsAuthenticated(false);
       } finally {
-      setLoading(false);
+        setLoading(false);
       }
     };
 
