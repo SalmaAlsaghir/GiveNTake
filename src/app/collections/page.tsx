@@ -17,6 +17,18 @@ export default function CollectionsListPage() {
       setCollections(data || []);
       setLoading(false);
     })();
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        setLoading(true);
+        (async () => {
+          const { data } = await ListingsService.getAllCollections();
+          setCollections(data || []);
+          setLoading(false);
+        })();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
   if (loading) {

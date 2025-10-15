@@ -39,6 +39,31 @@ export default function CollectionDetailPage() {
     })();
   }, [id]);
 
+  // Reload collection and listings when the tab regains focus
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        setLoading(true);
+        (async () => {
+          try {
+            const [{ data: col }, { data: items }] = await Promise.all([
+              ListingsService.getCollectionById(id as string),
+              ListingsService.getListingsByCollection(id as string),
+            ]);
+            setCollection(col || null);
+            setListings(items || []);
+          } catch (e: unknown) {
+            console.error(e);
+          } finally {
+            setLoading(false);
+          }
+        })();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [id]);
+
   if (loading) {
     return (
       <AppLayout>

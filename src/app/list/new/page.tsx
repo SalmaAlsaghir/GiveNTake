@@ -113,6 +113,25 @@ export default function NewListingPage() {
     })();
   }, [toast, user]);
 
+  // Reload categories and collections when the tab regains focus
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        // Reload categories and collections when tab becomes active
+        (async () => {
+          const { data: catData, error: catError } = await ListingsService.getCategories();
+          if (!catError && catData) setCategories(catData);
+          if (user) {
+            const { data: colData, error: colError } = await ListingsService.getUserCollections(user.id);
+            if (!colError && colData) setCollections(colData.map(c => ({ id: c.id, title: c.title })));
+          }
+        })();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user]);
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
     const currentFiles = form.getValues("images");

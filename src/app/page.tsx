@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -57,6 +56,29 @@ export default function BrowsePage() {
       );
     setFilteredListings(results);
   }, [searchQuery, listings]);
+
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        setLoading(true);
+        (async () => {
+          try {
+            const { data, error } = await ListingsService.getAllListings();
+            if (!error && data) {
+              setListings(data);
+              setFilteredListings(data);
+            }
+          } catch (err) {
+            // ignore
+          } finally {
+            setLoading(false);
+          }
+        })();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
 
   if (loading) {
     return (

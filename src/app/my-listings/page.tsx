@@ -69,6 +69,30 @@ export default function MyListingsPage() {
     loadMyListings();
   }, [user, toast]);
 
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible') {
+        setLoading(true);
+        (async () => {
+          if (!user) {
+            setLoading(false);
+            return;
+          }
+          try {
+            const { data, error } = await ListingsService.getUserListings(user.id);
+            if (!error && data) setMyListings(data);
+          } catch (err) {
+            // ignore
+          } finally {
+            setLoading(false);
+          }
+        })();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user]);
+
   const handleDelete = async (id: string) => {
     try {
       // Hard delete from database as requested

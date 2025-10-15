@@ -70,6 +70,28 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
         loadCategoryListings();
     }, [category, toast]);
 
+    // Reload listings when the tab regains focus
+    useEffect(() => {
+        function handleVisibilityChange() {
+            if (document.visibilityState === 'visible') {
+                setLoading(true);
+                (async () => {
+                    try {
+                        const { data, error } = await ListingsService.getListingsByCategory(category);
+                        if (!error && data) {
+                            setListings(data);
+                            setFilteredListings(data);
+                        }
+                    } finally {
+                        setLoading(false);
+                    }
+                })();
+            }
+        }
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [category]);
+
     useEffect(() => {
         const results = listings
             .filter((listing) => listing.status !== 'sold')
