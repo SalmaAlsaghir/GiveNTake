@@ -397,18 +397,28 @@ export default function NewListingPage() {
                       <div>
                         <Button
                           type="button"
+                          disabled={!newCollectionTitle.trim() || isSubmitting}
                           onClick={async () => {
                             if (!newCollectionTitle.trim()) return;
+                            setIsSubmitting(true);
                             const { data, error } = await ListingsService.createCollection(newCollectionTitle.trim(), newCollectionDescription.trim() || undefined);
+                            setIsSubmitting(false);
                             if (!error && data) {
                               setCollections((prev) => [{ id: data.id, title: data.title }, ...prev]);
                               setCreateNewCollection(false);
                               setNewCollectionTitle('');
                               setNewCollectionDescription('');
                               form.setValue('collection_id', data.id);
+                            } else {
+                              toast({
+                                variant: 'destructive',
+                                title: 'Collection Creation Failed',
+                                description: error?.message || 'Could not create collection. Please try again.'
+                              });
                             }
                           }}
                         >
+                          {isSubmitting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
                           Create Collection
                         </Button>
                       </div>
