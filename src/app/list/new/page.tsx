@@ -32,7 +32,6 @@ import { Wand2, Loader2, Image as ImageIcon, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { ListingsService } from "@/lib/listings-service";
-import { Label } from "@/components/ui/label";
 
 const listingFormSchema = z.object({
   title: z.string().min(5, "Title must be at least 5 characters long."),
@@ -112,7 +111,7 @@ export default function NewListingPage() {
       const { data, error } = await ListingsService.getUserCollections(user.id);
       if (!error && data) setCollections(data.map(c => ({ id: c.id, title: c.title })));
     })();
-  }, [toast]);
+  }, [toast, user]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files ? Array.from(e.target.files) : [];
@@ -145,12 +144,14 @@ export default function NewListingPage() {
   const handleGenerateDetails = async () => {
     const title = form.getValues("title");
     const description = form.getValues("description");
+    const imageFiles = form.getValues("images");
     
-    if (!title || !description) {
+    // Check if we have at least images OR title/description
+    if (!imageFiles.length && (!title || !description)) {
       toast({ 
         variant: "destructive", 
         title: "Input Required", 
-        description: "Please enter both a title and description first to generate AI suggestions." 
+        description: "Please upload at least one image, or enter a title and description to generate AI suggestions." 
       });
       return;
     }
@@ -158,7 +159,6 @@ export default function NewListingPage() {
     setGeneratingDetails(true);
     try {
       // Convert images to base64 data URIs
-      const imageFiles = form.getValues("images");
       const imageDataUris = await Promise.all(
         imageFiles.map(file => file ? readFileAsDataURL(file) : Promise.resolve(""))
       ).then(uris => uris.filter(Boolean));
@@ -169,29 +169,31 @@ export default function NewListingPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          title,
-          description,
+          title: title || '',
+          description: description || '',
           images: imageDataUris,
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to generate AI content');
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        throw new Error(errorData.error || 'Failed to generate AI content');
       }
 
       const result = await response.json();
       
       console.log('AI Response:', result);
-      console.log('Current form values before update:', form.getValues());
       
       // Update form with AI suggestions
-      form.setValue("title", result.suggestedTitle);
-      form.setValue("description", result.suggestedDescription);
-      
-      // Force a re-render
-      setForceUpdate(prev => prev + 1);
-      
-      console.log('Form values after update:', form.getValues());
+      if (result.suggestedTitle) {
+        form.setValue("title", result.suggestedTitle);
+      }
+      if (result.suggestedDescription) {
+        form.setValue("description", result.suggestedDescription);
+      }
+      if (result.suggestedCondition) {
+        form.setValue("condition", result.suggestedCondition);
+      }
       
       toast({
         title: "AI Suggestions Generated!",
@@ -199,10 +201,11 @@ export default function NewListingPage() {
       });
     } catch (error: unknown) {
       console.error('AI generation error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to generate AI suggestions. Please try again.';
       toast({ 
         variant: "destructive", 
         title: "AI Generation Failed", 
-        description: "Failed to generate AI suggestions. Please try again." 
+        description: errorMessage
       });
     } finally {
       setGeneratingDetails(false);
@@ -326,10 +329,22 @@ export default function NewListingPage() {
                         </FormItem>
                       )}
                     />
-                    <Button type="button" onClick={handleGenerateDetails} disabled={generatingDetails}>
-                      {generatingDetails ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2 h-4 w-4" />}
-                      Generate with AI
+                    <Button type="button" onClick={handleGenerateDetails} disabled={generatingDetails} variant="outline" className="w-full">
+                      {generatingDetails ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Generating...
+                        </>
+                      ) : (
+                        <>
+                          <Wand2 className="mr-2 h-4 w-4" />
+                          Generate with AI
+                        </>
+                      )}
                     </Button>
+                    <FormDescription>
+                      Upload images and let AI generate a detailed listing for you, or use it to enhance your existing description.
+                    </FormDescription>
                   </CardContent>
                 </Card>
               <Card>
