@@ -296,11 +296,21 @@ export default function NewListingPage() {
 
   return (
     <AppLayout>
-       <div className="flex-1 space-y-8 p-4 md:p-8">
-        <div>
-          <h1 className="text-4xl font-bold tracking-tight font-headline">Post a New Listing</h1>
-          <p className="text-muted-foreground">Fill in the details below to sell your item.</p>
-        </div>
+      <div className="flex-1 space-y-8 p-4 md:p-8">
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-primary/20 to-accent/30 rounded-2xl shadow-lg p-8 mb-8 flex flex-col md:flex-row items-center justify-between gap-8 animate-fade-in">
+          <div className="flex-1">
+            <h1 className="text-5xl md:text-6xl font-extrabold font-headline text-primary mb-4 drop-shadow-lg">
+              Post a New Listing
+            </h1>
+            <p className="text-lg md:text-2xl text-muted-foreground mb-6 font-semibold">
+              Share your items with fellow students! Upload photos, add details, and let the campus community discover your listing.
+            </p>
+          </div>
+          <div className="hidden md:block flex-1 text-center">
+            <img src="/listing-hero.svg" alt="Post Listing" className="w-72 mx-auto drop-shadow-xl rounded-2xl" />
+          </div>
+        </section>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">

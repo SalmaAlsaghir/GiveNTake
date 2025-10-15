@@ -39,6 +39,9 @@ import {
   Laptop,
   Lamp,
   Sparkles,
+  BarChart2,
+  Settings,
+  Heart,
 } from "lucide-react";
 
 import { useAuth } from "@/context/auth-context";
@@ -92,6 +95,19 @@ function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href={`/users/${user.id}`} className="flex items-center">
+            <User className="mr-2 h-4 w-4" />
+            <span>My Profile</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/settings" className="flex items-center">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
@@ -105,13 +121,16 @@ function NavLinks() {
     const { isAuthenticated } = useAuth();
     const pathname = usePathname();
 
-    const navItems = [
-        { href: "/", label: "Browse", icon: Home, auth: false },
-      { href: "/collections", label: "Collections", icon: Package, auth: false },
-        { href: "/list/new", label: "Post a Listing", icon: PlusCircle, auth: true },
-        { href: "/my-listings", label: "My Listings", icon: Package, auth: true },
-        { href: "/safety", label: "How to Transact", icon: Handshake, auth: false },
-    ];
+  const navItems = [
+    { href: "/", label: "Browse", icon: Home, auth: false },
+    { href: "/collections", label: "Collections", icon: Package, auth: false },
+    { href: "/wishlist", label: "Wishlist", icon: Heart, auth: false },
+    { href: "/stats", label: "Statistics", icon: BarChart2, auth: false },
+    { href: "/list/new", label: "Post a Listing", icon: PlusCircle, auth: true },
+    { href: "/my-listings", label: "My Listings", icon: Package, auth: true },
+    { href: "/wishlist/my-wishlist", label: "My Wishlist", icon: Heart, auth: true },
+    { href: "/safety", label: "How to Transact", icon: Handshake, auth: false },
+  ];
 
     const categoryItems = [
       { href: "/browse/textbooks", label: "Textbooks", icon: Book },

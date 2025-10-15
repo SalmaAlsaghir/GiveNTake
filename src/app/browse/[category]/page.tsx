@@ -42,9 +42,13 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        let mounted = true;
+        
         const loadCategoryListings = async () => {
             try {
                 const { data, error } = await ListingsService.getListingsByCategory(category);
+                if (!mounted) return; // Don't update state if component unmounted
+                
                 if (error) {
                     console.error(error);
                     toast({
@@ -57,24 +61,31 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
                     setFilteredListings(data);
                 }
             } catch (error) {
+                if (!mounted) return;
                 toast({
                     variant: "destructive",
                     title: "Error",
                     description: "An unexpected error occurred.",
                 });
             } finally {
-                setLoading(false);
+                if (mounted) {
+                    setLoading(false);
+                }
             }
         };
 
         loadCategoryListings();
+        
+        return () => {
+            mounted = false;
+        };
     }, [category, toast]);
 
-    // Reload listings when the tab regains focus
+    // Reload listings when the tab regains focus (without showing loading state)
     useEffect(() => {
         function handleVisibilityChange() {
             if (document.visibilityState === 'visible') {
-                setLoading(true);
+                // Reload data in background without setting loading state
                 (async () => {
                     try {
                         const { data, error } = await ListingsService.getListingsByCategory(category);
@@ -82,8 +93,8 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
                             setListings(data);
                             setFilteredListings(data);
                         }
-                    } finally {
-                        setLoading(false);
+                    } catch (err) {
+                        // Silently ignore errors on background refresh
                     }
                 })();
             }

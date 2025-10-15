@@ -19,9 +19,13 @@ export default function BrowsePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+    
     const loadListings = async () => {
       try {
         const { data, error } = await ListingsService.getAllListings();
+        if (!mounted) return; // Don't update state if component unmounted
+        
         if (error) {
           console.error(error);
           toast({
@@ -34,17 +38,24 @@ export default function BrowsePage() {
           setFilteredListings(data);
         }
       } catch (error) {
+        if (!mounted) return;
         toast({
           variant: "destructive",
           title: "Error",
           description: "An unexpected error occurred.",
         });
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadListings();
+    
+    return () => {
+      mounted = false;
+    };
   }, [toast]);
 
   useEffect(() => {
@@ -57,10 +68,11 @@ export default function BrowsePage() {
     setFilteredListings(results);
   }, [searchQuery, listings]);
 
+  // Reload listings when the tab regains focus (without showing loading state)
   useEffect(() => {
     function handleVisibilityChange() {
       if (document.visibilityState === 'visible') {
-        setLoading(true);
+        // Reload data in background without setting loading state
         (async () => {
           try {
             const { data, error } = await ListingsService.getAllListings();
@@ -69,9 +81,7 @@ export default function BrowsePage() {
               setFilteredListings(data);
             }
           } catch (err) {
-            // ignore
-          } finally {
-            setLoading(false);
+            // Silently ignore errors on background refresh
           }
         })();
       }
@@ -93,23 +103,31 @@ export default function BrowsePage() {
   return (
     <AppLayout>
       <div className="flex-1 space-y-8 p-4 md:p-8">
-        <div className="flex items-center justify-between space-y-2">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight font-headline">
-              Browse Listings
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-primary/30 to-accent/40 rounded-2xl shadow-lg p-8 mb-8 flex flex-col md:flex-row items-center justify-between gap-8 animate-fade-in">
+          <div className="flex-1">
+            <h1 className="text-5xl md:text-6xl font-extrabold font-headline text-primary mb-4 drop-shadow-lg">
+              Welcome to GiveNTake!
             </h1>
-            <p className="text-muted-foreground">
-              Find great deals from students near you.
+            <p className="text-lg md:text-2xl text-muted-foreground mb-6 font-semibold">
+              The campus marketplace for students. Buy, sell, and swap textbooks, electronics, and more with your uni community!
             </p>
+            <div className="flex gap-4">
+              <a href="/list/new" className="px-6 py-3 rounded-full bg-primary text-primary-foreground font-bold shadow-lg hover:scale-105 transition-transform">Post a Listing</a>
+              <a href="/collections" className="px-6 py-3 rounded-full bg-accent text-accent-foreground font-bold shadow-lg hover:scale-105 transition-transform">Browse Collections</a>
+            </div>
           </div>
-        </div>
-        
+          <div className="hidden md:block flex-1 text-center">
+            <img src="/campus-hero.svg" alt="Campus Vibe" className="w-72 mx-auto drop-shadow-xl rounded-2xl" />
+          </div>
+        </section>
+
         <div className="bg-card p-4 rounded-lg border mb-8">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input 
-              placeholder="Search for textbooks, electronics, and more..." 
-              className="pl-10 text-lg py-6"
+              placeholder="Search for items..." 
+              className="pl-10 text-lg py-6" 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />

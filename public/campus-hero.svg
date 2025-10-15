@@ -1,0 +1,6 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" rx="32" fill="#6366f1"/>
+  <circle cx="128" cy="128" r="80" fill="#fff"/>
+  <text x="50%" y="54%" text-anchor="middle" fill="#6366f1" font-size="32" font-family="PT Sans, sans-serif" dy=".3em">Campus</text>
+  <text x="50%" y="70%" text-anchor="middle" fill="#6366f1" font-size="20" font-family="PT Sans, sans-serif" dy=".3em">Vibe</text>
+</svg>

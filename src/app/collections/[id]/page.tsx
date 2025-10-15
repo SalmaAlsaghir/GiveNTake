@@ -23,27 +23,37 @@ export default function CollectionDetailPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+    
     (async () => {
       try {
         const [{ data: col }, { data: items }] = await Promise.all([
           ListingsService.getCollectionById(id as string),
           ListingsService.getListingsByCollection(id as string),
         ]);
-        setCollection(col || null);
-        setListings(items || []);
+        if (mounted) {
+          setCollection(col || null);
+          setListings(items || []);
+        }
       } catch (e: unknown) {
         console.error(e);
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     })();
+    
+    return () => {
+      mounted = false;
+    };
   }, [id]);
 
-  // Reload collection and listings when the tab regains focus
+  // Reload collection and listings when the tab regains focus (without showing loading state)
   useEffect(() => {
     function handleVisibilityChange() {
       if (document.visibilityState === 'visible') {
-        setLoading(true);
+        // Reload data in background without setting loading state
         (async () => {
           try {
             const [{ data: col }, { data: items }] = await Promise.all([
@@ -53,9 +63,7 @@ export default function CollectionDetailPage() {
             setCollection(col || null);
             setListings(items || []);
           } catch (e: unknown) {
-            console.error(e);
-          } finally {
-            setLoading(false);
+            // Silently ignore errors on background refresh
           }
         })();
       }

@@ -8,8 +8,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, Phone, Calendar, Package, TrendingUp, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { User, Mail, Phone, Calendar, Package, TrendingUp, CheckCircle, Clock, AlertCircle, Heart } from "lucide-react";
 import { ListingsService } from "@/lib/listings-service";
+import { WishlistService } from "@/lib/wishlist-service";
 import { supabase } from "@/lib/supabaseClient";
 import type { ListingWithImages } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
@@ -42,8 +43,9 @@ export default function UserProfilePage() {
   const { toast } = useToast();
   const [userProfile, setUserProfile] = useState<any>(null);
   const [userListings, setUserListings] = useState<ListingWithImages[]>([]);
+  const [userWishlist, setUserWishlist] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'all' | 'available' | 'negotiating' | 'sold' | 'collections'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'available' | 'negotiating' | 'sold' | 'collections' | 'wishlist'>('all');
   const [collections, setCollections] = useState<any[]>([]);
 
   const userId = params.id as string;
@@ -87,6 +89,10 @@ export default function UserProfilePage() {
         // Load user collections
         const { data: cols } = await ListingsService.getUserCollections(userId);
         setCollections(cols || []);
+
+        // Load user wishlist
+        const { data: wishlistData } = await WishlistService.getUserWishlistItems(userId);
+        setUserWishlist(wishlistData || []);
       } catch (error) {
         toast({
           variant: "destructive",
@@ -238,35 +244,48 @@ export default function UserProfilePage() {
               </div>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2">
+                <Heart className="h-5 w-5 text-pink-600" />
+                <div>
+                  <p className="text-2xl font-bold">{userWishlist.length}</p>
+                  <p className="text-sm text-muted-foreground">Wishlist Items</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Listings Tabs */}
         <Card>
           <CardHeader>
-            <CardTitle>Listings History</CardTitle>
+            <CardTitle>User Content</CardTitle>
           </CardHeader>
           <CardContent>
             {/* Tab Navigation */}
-            <div className="flex space-x-1 mb-6">
+            <div className="flex flex-wrap gap-2 mb-6">
               {[
-                { key: 'all', label: 'All', count: stats.total },
+                { key: 'all', label: 'All Listings', count: stats.total },
                 { key: 'available', label: 'Available', count: stats.available },
                 { key: 'negotiating', label: 'Negotiating', count: stats.negotiating },
                 { key: 'sold', label: 'Sold', count: stats.sold },
-                { key: 'collections', label: 'Collections', count: collections.length }
+                { key: 'collections', label: 'Collections', count: collections.length },
+                { key: 'wishlist', label: 'Wishlist', count: userWishlist.length }
               ].map((tab) => (
                 <Button
                   key={tab.key}
                   variant={activeTab === tab.key ? "default" : "outline"}
                   onClick={() => setActiveTab(tab.key as typeof activeTab)}
-                  className="flex-1"
+                  size="sm"
                 >
                   {tab.label} ({tab.count})
                 </Button>
               ))}
             </div>
 
-            {/* Listings Grid */}
+            {/* Content Display */}
             {activeTab === 'collections' ? (
               collections.length > 0 ? (
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -285,6 +304,36 @@ export default function UserProfilePage() {
                 </div>
               ) : (
                 <div className="text-center py-8 text-muted-foreground">No collections yet.</div>
+              )
+            ) : activeTab === 'wishlist' ? (
+              userWishlist.length > 0 ? (
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {userWishlist.map((item) => (
+                    <Card key={item.id} className="hover:shadow-md transition-shadow">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <CardTitle className="text-lg">{item.title}</CardTitle>
+                          {!item.is_active && (
+                            <Badge variant="secondary">Fulfilled</Badge>
+                          )}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-2">
+                        {item.description && (
+                          <p className="text-sm text-muted-foreground line-clamp-3">{item.description}</p>
+                        )}
+                        {item.budget && (
+                          <p className="text-sm font-semibold">Budget: {item.currency} {item.budget}</p>
+                        )}
+                        {item.categories?.name && (
+                          <Badge variant="outline">{item.categories.name}</Badge>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">No wishlist items yet.</div>
               )
             ) : filteredListings.length > 0 ? (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

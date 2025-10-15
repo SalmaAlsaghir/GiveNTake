@@ -37,14 +37,18 @@ export default function MyListingsPage() {
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
 
   useEffect(() => {
+    let mounted = true;
+    
     const loadMyListings = async () => {
       if (!user) {
-        setLoading(false);
+        if (mounted) setLoading(false);
         return;
       }
 
       try {
         const { data, error } = await ListingsService.getUserListings(user.id);
+        if (!mounted) return; // Don't update state if component unmounted
+        
         if (error) {
           console.error(error);
           toast({
@@ -56,35 +60,37 @@ export default function MyListingsPage() {
           setMyListings(data);
         }
       } catch (error) {
+        if (!mounted) return;
         toast({
           variant: "destructive",
           title: "Error",
           description: "An unexpected error occurred.",
         });
       } finally {
-        setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
     loadMyListings();
+    
+    return () => {
+      mounted = false;
+    };
   }, [user, toast]);
 
+  // Reload listings when the tab regains focus (without showing loading state)
   useEffect(() => {
     function handleVisibilityChange() {
-      if (document.visibilityState === 'visible') {
-        setLoading(true);
+      if (document.visibilityState === 'visible' && user) {
+        // Reload data in background without setting loading state
         (async () => {
-          if (!user) {
-            setLoading(false);
-            return;
-          }
           try {
             const { data, error } = await ListingsService.getUserListings(user.id);
             if (!error && data) setMyListings(data);
           } catch (err) {
-            // ignore
-          } finally {
-            setLoading(false);
+            // Silently ignore errors on background refresh
           }
         })();
       }
@@ -190,14 +196,20 @@ export default function MyListingsPage() {
   return (
     <AppLayout>
       <div className="flex-1 space-y-8 p-4 md:p-8">
-        <div className="flex items-center justify-between space-y-2">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight font-headline">My Listings</h1>
-            <p className="text-muted-foreground">
-              Manage your posted items here.
+        {/* Hero Section */}
+        <section className="bg-gradient-to-br from-primary/30 to-secondary/30 rounded-2xl shadow-lg p-8 mb-8 flex flex-col md:flex-row items-center justify-between gap-8 animate-fade-in">
+          <div className="flex-1">
+            <h1 className="text-5xl md:text-6xl font-extrabold font-headline text-primary mb-4 drop-shadow-lg">
+              My Listings
+            </h1>
+            <p className="text-lg md:text-2xl text-muted-foreground mb-6 font-semibold">
+              Manage your posted items, update details, and track interest from other students.
             </p>
           </div>
-        </div>
+          <div className="hidden md:block flex-1 text-center">
+            <img src="/my-listings-hero.svg" alt="My Listings" className="w-72 mx-auto drop-shadow-xl rounded-2xl" />
+          </div>
+        </section>
 
         {myListings.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
