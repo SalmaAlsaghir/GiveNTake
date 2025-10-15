@@ -258,7 +258,7 @@ export default function UserProfilePage() {
                 <Button
                   key={tab.key}
                   variant={activeTab === tab.key ? "default" : "outline"}
-                  onClick={() => setActiveTab(String(tab.key))}
+                  onClick={() => setActiveTab(tab.key as typeof activeTab)}
                   className="flex-1"
                 >
                   {tab.label} ({tab.count})

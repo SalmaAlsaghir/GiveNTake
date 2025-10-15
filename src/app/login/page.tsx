@@ -46,7 +46,9 @@ export default function LoginPage() {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: error.message || "Please check your credentials and try again.",
+          description: (typeof error === "object" && error !== null && "message" in error && typeof (error as any).message === "string")
+            ? (error as any).message
+            : "Please check your credentials and try again.",
         });
       } else {
         // Ensure profile exists after login

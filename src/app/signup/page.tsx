@@ -74,7 +74,13 @@ export default function SignupPage() {
       
       if (error) {
         // Check if this is an email verification error
-        if (error.message && error.message.includes("verification")) {
+        if (
+          typeof error === "object" &&
+          error !== null &&
+          "message" in error &&
+          typeof (error as any).message === "string" &&
+          (error as any).message.includes("verification")
+        ) {
           setVerificationEmail(formData.email);
           setShowVerificationMessage(true);
           toast({
@@ -85,7 +91,13 @@ export default function SignupPage() {
           toast({
             variant: "destructive",
             title: "Signup Failed",
-            description: error.message || "Please check your information and try again.",
+            description:
+              (typeof error === "object" &&
+                error !== null &&
+                "message" in error &&
+                typeof (error as any).message === "string"
+                ? (error as any).message
+                : "Please check your information and try again."),
           });
         }
       } else {
