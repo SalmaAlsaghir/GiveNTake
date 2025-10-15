@@ -442,12 +442,12 @@ export default function EditListingPage() {
                                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                   <ImageIcon className="w-8 h-8 mb-4 text-muted-foreground" />
                                   <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                  <p className="text-xs text-muted-foreground">PNG, JPG or WEBP (MAX. 3 images total)</p>
+                                  <p className="text-xs text-muted-foreground">PNG, JPG or WEBP (MAX. 2 images total)</p>
                                 </div>
-                                <input id="dropzone-file" type="file" className="hidden" multiple accept="image/*" onChange={handleImageChange} disabled={imagePreviews.length >= 3} />
+                                <input id="dropzone-file" type="file" className="hidden" multiple accept="image/*" onChange={handleImageChange} disabled={imagePreviews.length >= 2} />
                                 <p className="text-xs text-muted-foreground mt-2">
                                   You have {existingImages.length} existing image(s) and {form.getValues("images")?.length || 0} new image(s). 
-                                  You can add up to {3 - imagePreviews.length} more.
+                                  You can add up to {2 - imagePreviews.length} more.
                                 </p>
                               </label>
                             </div>

@@ -417,9 +417,9 @@ export default function NewListingPage() {
                                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
                                   <ImageIcon className="w-8 h-8 mb-4 text-muted-foreground" />
                                   <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-                                  <p className="text-xs text-muted-foreground">PNG, JPG or WEBP (MAX. 3 images)</p>
+                                  <p className="text-xs text-muted-foreground">PNG, JPG or WEBP (MAX. 2 images)</p>
                                 </div>
-                                <input id="dropzone-file" type="file" className="hidden" multiple accept="image/*" onChange={handleImageChange} disabled={form.getValues("images").length >= 3} />
+                                <input id="dropzone-file" type="file" className="hidden" multiple accept="image/*" onChange={handleImageChange} disabled={form.getValues("images").length >= 2} />
                               </label>
                             </div>
                           </FormControl>
