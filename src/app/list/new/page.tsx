@@ -197,7 +197,7 @@ export default function NewListingPage() {
         title: "AI Suggestions Generated!",
         description: "Your listing has been enhanced with AI-generated content.",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('AI generation error:', error);
       toast({ 
         variant: "destructive", 
@@ -298,7 +298,7 @@ export default function NewListingPage() {
                           <FormControl>
                             <Input 
                               placeholder="e.g., 'Introduction to Algorithms, 3rd Edition'" 
-                              value={form.watch('title')} 
+                              value={form.watch('title') ?? ""} 
                               onChange={(e) => form.setValue('title', e.target.value)}
                               key={forceUpdate}
                             />
@@ -316,7 +316,7 @@ export default function NewListingPage() {
                           <FormControl>
                             <Textarea 
                               placeholder="Describe the item's condition, features, and any other relevant details." 
-                              value={form.watch('description')} 
+                              value={form.watch('description') ?? ""} 
                               onChange={(e) => form.setValue('description', e.target.value)}
                               rows={5} 
                               key={forceUpdate}
@@ -373,11 +373,11 @@ export default function NewListingPage() {
                     <div className="space-y-3">
                       <div>
                         <FormLabel>New Collection Title</FormLabel>
-                        <Input value={newCollectionTitle} onChange={(e) => setNewCollectionTitle(e.target.value)} placeholder="e.g., I'm moving out!" />
+                        <Input value={newCollectionTitle ?? ""} onChange={(e) => setNewCollectionTitle(e.target.value)} placeholder="e.g., I'm moving out!" />
                       </div>
                       <div>
                         <FormLabel>Description (optional)</FormLabel>
-                        <Textarea value={newCollectionDescription} onChange={(e) => setNewCollectionDescription(e.target.value)} placeholder="Describe what's in this collection." rows={3} />
+                        <Textarea value={newCollectionDescription ?? ""} onChange={(e) => setNewCollectionDescription(e.target.value)} placeholder="Describe what's in this collection." rows={3} />
                       </div>
                       <div>
                         <Button

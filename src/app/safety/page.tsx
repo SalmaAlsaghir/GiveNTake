@@ -60,9 +60,9 @@ export default function HowToTransactPage() {
                     <ShieldCheck /> A Friendly Reminder
                 </CardTitle>
             </CardHeader>
-            <CardContent>
-                <p className="text-blue-700/80">Trust your instincts. If a deal seems too good to be true or a situation feels uncomfortable, it's okay to walk away. Your safety is the top priority. Report any suspicious activity to keep the community safe.</p>
-            </CardContent>
+      <CardContent>
+        <p className="text-blue-700/80">Trust your instincts. If a deal seems too good to be true or a situation feels uncomfortable, it&apos;s okay to walk away. Your safety is the top priority. Report any suspicious activity to keep the community safe.</p>
+      </CardContent>
         </Card>
       </div>
     </AppLayout>

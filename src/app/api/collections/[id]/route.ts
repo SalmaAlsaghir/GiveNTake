@@ -11,8 +11,9 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
       .single();
     if (error) return NextResponse.json({ error: error.message }, { status: 404 });
     return NextResponse.json({ data });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Unknown error' }, { status: 500 });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: msg || 'Unknown error' }, { status: 500 });
   }
 }
 
@@ -41,8 +42,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
       .single();
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ data });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Unknown error' }, { status: 500 });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: msg || 'Unknown error' }, { status: 500 });
   }
 }
 
@@ -65,8 +67,9 @@ export async function DELETE(_: NextRequest, { params }: { params: { id: string 
     const { data, error } = await supabase.from('collections').delete().eq('id', params.id).select().single();
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
     return NextResponse.json({ data });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Unknown error' }, { status: 500 });
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return NextResponse.json({ error: msg || 'Unknown error' }, { status: 500 });
   }
 }
 

@@ -32,6 +32,7 @@ interface ListingCardProps {
   listing: Listing;
   showDelete?: boolean;
   showEdit?: boolean;
+  showStatus?: boolean;
   onDelete?: (id: string) => void;
   onEditStatus?: (listingId: string) => void;
 }
@@ -70,10 +71,12 @@ export function ListingCard({
   listing,
   showDelete = false,
   showEdit = false,
+  showStatus = true,
   onDelete,
   onEditStatus,
 }: ListingCardProps) {
-  const { toast } = useToast();
+  // toast not used here; keep hook for future notifications
+  useToast();
   const router = useRouter();
 
   const handleDelete = () => {
@@ -117,7 +120,7 @@ export function ListingCard({
             <Badge variant={conditionVariantMap[listing.condition]} className="text-xs">
             {conditionTextMap[listing.condition]}
             </Badge>
-            {listing.status && (
+            {showStatus && listing.status && (
               <Badge variant={statusConfig[listing.status as keyof typeof statusConfig]?.variant || "outline"} className="text-xs">
                 {statusConfig[listing.status as keyof typeof statusConfig]?.label || listing.status}
               </Badge>
@@ -206,7 +209,7 @@ export function ListingCard({
                 <AlertDialogTitle>Are you sure?</AlertDialogTitle>
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete your
-                  listing for "{listing.title}".
+                  listing for {listing.title}.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

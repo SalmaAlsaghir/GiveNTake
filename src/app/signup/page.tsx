@@ -145,7 +145,7 @@ export default function SignupPage() {
             </div>
             <CardTitle className="text-2xl font-headline">Check Your Email</CardTitle>
             <CardDescription>
-              We've sent a verification link to {verificationEmail}
+              We&apos;ve sent a verification link to {verificationEmail}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -203,7 +203,7 @@ export default function SignupPage() {
                 id="username" 
                 placeholder="Student123" 
                 required 
-                value={formData.username}
+                value={formData.username ?? ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -214,7 +214,7 @@ export default function SignupPage() {
                 type="email"
                 placeholder="m@example.com"
                 required
-                value={formData.email}
+                value={formData.email ?? ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -225,7 +225,7 @@ export default function SignupPage() {
                 type="tel"
                 placeholder="+971 50 123 4567"
                 required
-                value={formData.phone}
+                value={formData.phone ?? ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -235,7 +235,7 @@ export default function SignupPage() {
                 id="password" 
                 type="password" 
                 required 
-                value={formData.password}
+                value={formData.password ?? ""}
                 onChange={handleInputChange}
               />
             </div>
@@ -245,7 +245,7 @@ export default function SignupPage() {
                 id="confirmPassword" 
                 type="password" 
                 required 
-                value={formData.confirmPassword}
+                value={formData.confirmPassword ?? ""}
                 onChange={handleInputChange}
               />
             </div>

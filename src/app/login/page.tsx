@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -20,7 +21,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signIn } = useAuth();
+  const { signIn, ensureProfile } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -41,7 +42,6 @@ export default function LoginPage() {
 
     try {
       const { error } = await signIn(formData.email, formData.password);
-      
       if (error) {
         toast({
           variant: "destructive",
@@ -49,10 +49,16 @@ export default function LoginPage() {
           description: error.message || "Please check your credentials and try again.",
         });
       } else {
+        // Ensure profile exists after login
+        const user = supabase.auth.getUser ? (await supabase.auth.getUser()).data.user : null;
+        if (user && typeof user.id === 'string' && typeof user.email === 'string') {
+          await ensureProfile(user.id, user.email, user.user_metadata?.username ?? undefined, user.user_metadata?.phone_number ?? undefined);
+        }
         toast({
           title: "Login Successful! 🎉",
           description: "Welcome back to GiveNTake!",
         });
+        // Optionally, trigger listings refetch here if you use a global state/store
         router.push("/");
       }
     } catch (error) {

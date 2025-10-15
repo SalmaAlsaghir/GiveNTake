@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// TODO: Replace `any` uses with proper types
 import { AppLayout } from "@/components/app-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

@@ -397,11 +397,11 @@ export default function EditListingPage() {
                       <div className="space-y-3">
                         <div>
                           <FormLabel>New Collection Title</FormLabel>
-                          <Input value={newCollectionTitle} onChange={(e) => setNewCollectionTitle(e.target.value)} placeholder="e.g., I'm moving out!" />
+                          <Input value={newCollectionTitle ?? ""} onChange={(e) => setNewCollectionTitle(e.target.value)} placeholder="e.g., I'm moving out!" />
                         </div>
                         <div>
                           <FormLabel>Description (optional)</FormLabel>
-                          <Textarea value={newCollectionDescription} onChange={(e) => setNewCollectionDescription(e.target.value)} placeholder="Describe what's in this collection." rows={3} />
+                          <Textarea value={newCollectionDescription ?? ""} onChange={(e) => setNewCollectionDescription(e.target.value)} placeholder="Describe what's in this collection." rows={3} />
                         </div>
                         <div>
                           <Button

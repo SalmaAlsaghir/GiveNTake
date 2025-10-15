@@ -4,7 +4,6 @@
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/app-layout";
 import { ListingCard } from "@/components/listing-card";
-import { Button } from "@/components/ui/button";
 import { Search, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { ListingWithImages } from "@/lib/types";
@@ -25,6 +24,7 @@ export default function BrowsePage() {
       try {
         const { data, error } = await ListingsService.getAllListings();
         if (error) {
+          console.error(error);
           toast({
             variant: "destructive",
             title: "Error",
@@ -115,8 +115,9 @@ export default function BrowsePage() {
                   location: listing.location || "",
                   createdAt: listing.created_at,
                   isActive: listing.is_active,
-                  collectionId: (listing as any).collections?.id,
-                  collectionTitle: (listing as any).collections?.title,
+                  status: listing.status,
+                  collectionId: listing.collections?.id,
+                  collectionTitle: listing.collections?.title,
                 }} 
               />
             ))}
@@ -126,12 +127,13 @@ export default function BrowsePage() {
             <Alert>
               <Frown className="h-4 w-4" />
               <AlertTitle>No Results Found</AlertTitle>
-              <AlertDescription>
-                {searchQuery 
-                  ? `Your search for "${searchQuery}" did not match any listings. Try a different search term.`
-                  : "No listings are currently available. Check back later!"
-                }
-              </AlertDescription>
+                <AlertDescription>
+                  {searchQuery ? (
+                    <>Your search for {searchQuery} did not match any listings. Try a different search term.</>
+                  ) : (
+                    <>No listings are currently available. Check back later!</>
+                  )}
+                </AlertDescription>
             </Alert>
           </div>
         )}

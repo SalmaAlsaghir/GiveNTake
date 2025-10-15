@@ -63,6 +63,7 @@ export default function ListingDetailPage() {
       try {
         const { data, error } = await ListingsService.getListingById(listingId);
         if (error) {
+          console.error(error);
           toast({
             variant: "destructive",
             title: "Error",
@@ -102,7 +103,7 @@ export default function ListingDetailPage() {
       <AppLayout>
         <div className="flex flex-col items-center justify-center h-full text-center p-8">
           <h2 className="text-2xl font-bold mb-2">Listing Not Found</h2>
-          <p className="text-muted-foreground mb-4">The listing you're looking for doesn't exist.</p>
+          <p className="text-muted-foreground mb-4">The listing you&apos;re looking for doesn&apos;t exist.</p>
           <Button onClick={() => router.back()}>Go Back</Button>
         </div>
       </AppLayout>

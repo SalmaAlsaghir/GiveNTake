@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+// TODO(tech-debt): Replace `any` occurrences in this file with proper types.
 import { supabase } from './supabaseClient';
 import type { ListingWithImages, Condition } from './types';
 

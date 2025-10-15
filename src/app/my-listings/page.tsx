@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { AppLayout } from "@/components/app-layout";
 import { ListingCard } from "@/components/listing-card";
+import type { ListingWithImages, ListingStatus } from "@/lib/types";
 import { useAuth } from "@/context/auth-context";
-import type { ListingWithImages } from "@/lib/types";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { FilePlus, Loader2, Edit3 } from "lucide-react";
@@ -33,7 +33,7 @@ export default function MyListingsPage() {
   const { toast } = useToast();
   const [myListings, setMyListings] = useState<ListingWithImages[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingStatus, setEditingStatus] = useState<{ listingId: string; newStatus: string } | null>(null);
+  const [editingStatus, setEditingStatus] = useState<{ listingId: string; newStatus: ListingStatus } | null>(null);
   const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
 
   useEffect(() => {
@@ -46,6 +46,7 @@ export default function MyListingsPage() {
       try {
         const { data, error } = await ListingsService.getUserListings(user.id);
         if (error) {
+          console.error(error);
           toast({
             variant: "destructive",
             title: "Error",
@@ -177,7 +178,7 @@ export default function MyListingsPage() {
         {myListings.length > 0 ? (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {myListings.map((listing) => (
-              <ListingCard
+                <ListingCard
                 key={listing.id}
                 listing={{
                   id: listing.id,
@@ -195,15 +196,15 @@ export default function MyListingsPage() {
                   location: listing.location || "",
                   createdAt: listing.created_at,
                   isActive: listing.is_active,
-                  status: listing.status as any,
-                  collectionId: (listing as any).collections?.id,
-                  collectionTitle: (listing as any).collections?.title,
+                    status: listing.status as ListingStatus,
+                  collectionId: listing.collections?.id,
+                  collectionTitle: listing.collections?.title,
                 }}
                 showDelete
                 showEdit
                 showStatus
                 onDelete={handleDelete}
-                onEditStatus={(listingId) => setEditingStatus({ listingId, newStatus: '' })}
+                onEditStatus={() => setEditingStatus({ listingId: listing.id, newStatus: listing.status as ListingStatus })}
               />
             ))}
           </div>
@@ -212,7 +213,7 @@ export default function MyListingsPage() {
             <h3 className="text-2xl font-bold tracking-tight">
               You haven't posted any items yet.
             </h3>
-            <p className="text-muted-foreground mb-6">
+            <p className="text-muted-foreground mb-4">
               Click the button below to create your first listing!
             </p>
             <Button size="lg" asChild>
@@ -238,7 +239,7 @@ export default function MyListingsPage() {
                 <Select
                   value={editingStatus?.newStatus || ''}
                   onValueChange={(value) =>
-                    setEditingStatus(prev => prev ? { ...prev, newStatus: value } : null)
+                    setEditingStatus(prev => prev ? { ...prev, newStatus: value as ListingStatus } : null)
                   }
                 >
                   <SelectTrigger className="col-span-3">

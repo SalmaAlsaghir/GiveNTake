@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use as reactUse } from "react";
 import { AppLayout } from "@/components/app-layout";
 import { ListingCard } from "@/components/listing-card";
 import type { ListingWithImages } from "@/lib/types";
@@ -27,7 +27,12 @@ const categoryDisplayNameMap: { [key: string]: string } = {
 };
 
 export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) {
-    const { category } = params;
+    // Next.js 15+: params may be a Promise, unwrap with use()
+    // See: https://nextjs.org/docs/messages/app-dir-client-component-params-promise
+            const usableParams = typeof params === 'object' && params !== null && typeof (params as unknown as { then?: unknown }).then === 'function'
+                ? reactUse(params as unknown as Promise<{ category: string }>)
+                : params;
+        const { category } = usableParams;
     const { toast } = useToast();
     const categoryDisplayName = categoryDisplayNameMap[category] || decodeURIComponent(category).replace(/-/g, ' ');
 
@@ -41,6 +46,7 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
             try {
                 const { data, error } = await ListingsService.getListingsByCategory(category);
                 if (error) {
+                    console.error(error);
                     toast({
                         variant: "destructive",
                         title: "Error",
@@ -114,10 +120,10 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
                      <Alert>
                         <Info className="h-4 w-4" />
                         <AlertTitle>No Listings Found</AlertTitle>
-                        <AlertDescription>
-                            There are currently no listings in the "{categoryDisplayName}" category.
-                            <Button variant="link" asChild className="p-1 h-auto"><Link href="/">Browse all items</Link></Button>
-                        </AlertDescription>
+                                    <AlertDescription>
+                                        There are currently no listings in the {categoryDisplayName} category.
+                                        <Button variant="link" asChild className="p-1 h-auto"><Link href="/">Browse all items</Link></Button>
+                                    </AlertDescription>
                     </Alert>
                 ) : filteredListings.length > 0 ? (
                     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
@@ -140,9 +146,9 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
                                     location: listing.location || "",
                                     createdAt: listing.created_at,
                                     isActive: listing.is_active,
-                                     status: listing.status as any,
-                                     collectionId: (listing as any).collections?.id,
-                                     collectionTitle: (listing as any).collections?.title,
+                                     status: listing.status,
+                                     collectionId: listing.collections?.id,
+                                     collectionTitle: listing.collections?.title,
                                 }} 
                             />
                         ))}
@@ -153,7 +159,7 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
                             <Frown className="h-4 w-4" />
                             <AlertTitle>No Results Found</AlertTitle>
                             <AlertDescription>
-                                Your search for "{searchQuery}" did not match any listings in this category.
+                                Your search for {searchQuery} did not match any listings in this category.
                             </AlertDescription>
                         </Alert>
                     </div>

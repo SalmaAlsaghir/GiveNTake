@@ -9,22 +9,33 @@ import { Button } from "@/components/ui/button";
 import { ListingCard } from "@/components/listing-card";
 import { Loader2, ArrowLeft } from "lucide-react";
 
+type Collection = {
+  id: string;
+  title?: string;
+  description?: string | null;
+};
+
 export default function CollectionDetailPage() {
   const { id } = useParams();
   const router = useRouter();
-  const [collection, setCollection] = useState<any | null>(null);
+  const [collection, setCollection] = useState<Collection | null>(null);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
-      const [{ data: col }, { data: items }] = await Promise.all([
-        ListingsService.getCollectionById(id as string),
-        ListingsService.getListingsByCollection(id as string),
-      ]);
-      setCollection(col || null);
-      setListings(items || []);
-      setLoading(false);
+      try {
+        const [{ data: col }, { data: items }] = await Promise.all([
+          ListingsService.getCollectionById(id as string),
+          ListingsService.getListingsByCollection(id as string),
+        ]);
+        setCollection(col || null);
+        setListings(items || []);
+      } catch (e: unknown) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
     })();
   }, [id]);
 
@@ -78,18 +89,18 @@ export default function CollectionDetailPage() {
                   price: listing.price,
                   currency: listing.currency,
                   condition: listing.condition,
-                  category: listing.categories.name,
-                  imageUrls: listing.listing_images.map((img: any) => img.image_url),
+                  category: listing.categories?.name || "",
+                  imageUrls: (listing.listing_images || []).map((img: any) => img.image_url),
                   userId: listing.user_id,
-                  username: listing.profiles.username,
-                  userEmail: listing.profiles.email,
-                  userPhone: listing.profiles.phone_number || "",
+                  username: listing.profiles?.username || "",
+                  userEmail: listing.profiles?.email || "",
+                  userPhone: listing.profiles?.phone_number || "",
                   location: listing.location || "",
                   createdAt: listing.created_at,
                   isActive: listing.is_active,
                   status: listing.status,
-                  collectionId: (listing as any).collections?.id,
-                  collectionTitle: (listing as any).collections?.title,
+                  collectionId: listing.collections?.id,
+                  collectionTitle: listing.collections?.title,
                 }}
               />
             ))}

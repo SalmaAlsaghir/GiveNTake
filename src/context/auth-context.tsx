@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react";
-import { User, Session } from '@supabase/supabase-js';
+import { User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabaseClient';
 import type { UserProfile } from "@/lib/types";
 
@@ -10,11 +10,12 @@ interface AuthContextType {
   profile: UserProfile | null;
   loading: boolean;
   isAuthenticated: boolean;
-  signUp: (email: string, password: string, username: string, phone_number?: string) => Promise<{ error: any; data?: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, username: string, phone_number?: string) => Promise<{ error: unknown; data?: unknown }>;
+  signIn: (email: string, password: string) => Promise<{ error: unknown }>;
   signOut: () => Promise<void>;
-  updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>;
-  resendVerificationEmail: (email: string) => Promise<{ error: any }>;
+  updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: unknown }>;
+  resendVerificationEmail: (email: string) => Promise<{ error: unknown }>;
+  ensureProfile: (userId: string, email: string, username?: string, phone_number?: string) => Promise<unknown>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -244,6 +245,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error };
   };
 
+  // Ensure profile exists via API route (robust for RLS)
+  const ensureProfile = async (userId: string, email: string, username?: string, phone_number?: string) => {
+    try {
+      const res = await fetch("/api/profiles/ensure", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId, email, username, phone_number }),
+      });
+      const result = await res.json();
+      if (!res.ok) {
+        console.error("Error ensuring profile:", result.error);
+      }
+      return result;
+    } catch (e) {
+      console.error("Exception in ensureProfile:", e);
+      return { error: e };
+    }
+  };
+
   const value = {
     user,
     profile,
@@ -254,6 +274,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signOut,
     updateProfile,
     resendVerificationEmail,
+    ensureProfile,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

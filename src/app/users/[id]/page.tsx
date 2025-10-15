@@ -74,11 +74,12 @@ export default function UserProfilePage() {
         // Load user listings
         const { data: listingsData, error: listingsError } = await ListingsService.getUserListings(userId);
         if (listingsError) {
-          toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Failed to load user listings.",
-          });
+              console.error(listingsError);
+              toast({
+                variant: "destructive",
+                title: "Error",
+                description: "Failed to load user listings.",
+              });
         } else if (listingsData) {
           setUserListings(listingsData);
         }
@@ -257,7 +258,7 @@ export default function UserProfilePage() {
                 <Button
                   key={tab.key}
                   variant={activeTab === tab.key ? "default" : "outline"}
-                  onClick={() => setActiveTab(tab.key as any)}
+                  onClick={() => setActiveTab(String(tab.key))}
                   className="flex-1"
                 >
                   {tab.label} ({tab.count})
@@ -306,7 +307,7 @@ export default function UserProfilePage() {
                       location: listing.location || "",
                       createdAt: listing.created_at,
                       isActive: listing.is_active,
-                      status: listing.status as any,
+                      status: listing.status,
                     }}
                     showStatus
                   />
