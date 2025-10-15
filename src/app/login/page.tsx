@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { supabase } from "@/lib/supabaseClient";
 import { Button } from "@/components/ui/button";
@@ -19,8 +19,9 @@ import { Logo } from "@/components/logo";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signIn, ensureProfile } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -28,6 +29,9 @@ export default function LoginPage() {
     email: "",
     password: "",
   });
+
+  // Get redirect parameter from URL
+  const redirectTo = searchParams.get('redirect') || '/';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -60,8 +64,8 @@ export default function LoginPage() {
           title: "Login Successful! 🎉",
           description: "Welcome back to GiveNTake!",
         });
-        // Optionally, trigger listings refetch here if you use a global state/store
-        router.push("/");
+        // Redirect to the original page or homepage
+        router.push(redirectTo);
       }
     } catch (error) {
       toast({
@@ -123,5 +127,17 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

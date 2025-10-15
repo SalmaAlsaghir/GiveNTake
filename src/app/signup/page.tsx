@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,8 +18,9 @@ import { Logo } from "@/components/logo";
 import { Loader2, Mail, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
-export default function SignupPage() {
+function SignupForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { signUp, resendVerificationEmail } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,6 +33,9 @@ export default function SignupPage() {
     password: "",
     confirmPassword: "",
   });
+
+  // Get redirect parameter from URL
+  const redirectTo = searchParams.get('redirect') || '/';
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -105,7 +109,7 @@ export default function SignupPage() {
           title: "Account Created Successfully! 🎉",
           description: "Welcome to GiveNTake! You can now post listings and start trading.",
         });
-        router.push("/");
+        router.push(redirectTo);
       }
     } catch (error) {
       toast({
@@ -275,5 +279,17 @@ export default function SignupPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <SignupForm />
+    </Suspense>
   );
 }
