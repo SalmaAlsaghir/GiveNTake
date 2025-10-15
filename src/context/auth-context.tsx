@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => clearTimeout(timeout);
   }, [loading]);
 
-  const fetchProfile = async (userId: string) {
+  const fetchProfile = async (userId: string) => {
     try {
       console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
