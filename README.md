@@ -185,6 +185,18 @@ GiveNTake/
 - **[WISHLIST_SETUP.md](WISHLIST_SETUP.md)** - Wishlist feature guide
 - **[AI_IMPLEMENTATION_SUMMARY.md](AI_IMPLEMENTATION_SUMMARY.md)** - AI features
 - **[docs/blueprint.md](docs/blueprint.md)** - Project architecture
+ - **[RUBRIC_ALIGNMENT.md](RUBRIC_ALIGNMENT.md)** - Evidence mapped to scoring categories
+ - **[ACCESSIBILITY.md](ACCESSIBILITY.md)** - Accessibility and UX considerations
+
+## 🤖 LLM Usage & Disclosure
+
+This project was built through AI-assisted development from a blank Next.js starter.
+
+- LLMs Used: GitHub Copilot (GPT-4), Google Gemini 2.0 Flash
+- Methodology: Role prompts, iterative refinement, acceptance criteria, testing notes
+- Reproducibility: See `HACKATHON_PROMPTS.md` for conversation-style prompts and export examples
+- Safety & Guardrails: No PII requested, input validation via Zod, RLS on DB, minimal scopes for env keys
+- Manual Tweaks: Limited to environment configuration and prompt iteration; no hand-written feature code outside AI assistance
 
 ## 🔧 Database Schema
 
@@ -221,6 +233,19 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_GOOGLE_API_KEY=your-google-ai-key (optional)
 ```
+
+## ♿ Accessibility & UX
+
+We follow accessible defaults and mobile-first patterns:
+
+- Semantic HTML in pages and components
+- Keyboard navigation and focus states (Radix UI primitives)
+- Color contrast checked against WCAG 2.1 AA for primary surfaces
+- Reduced motion respected via prefers-reduced-motion
+- Touch targets at least 44px on mobile
+- Clear empty states and non-blocking loaders
+
+See `ACCESSIBILITY.md` for details.
 
 ## 🎯 What's New
 
