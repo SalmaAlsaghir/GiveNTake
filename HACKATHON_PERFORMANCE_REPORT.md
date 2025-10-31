@@ -3,7 +3,7 @@
 
 **Project:** GiveNTake - NYUAD Student Marketplace  
 **Track:** Launch  
-**Date:** October 15, 2025  
+**Date:** October 31, 2025  
 **Developer:** Salma Mansour  
 **LLMs Used:** GitHub Copilot (GPT-4), Google Gemini 2.0 Flash  
 
@@ -23,13 +23,13 @@ GiveNTake is a **fully functional, production-ready** student marketplace platfo
 
 | Feature | Status | Performance Notes |
 |---------|--------|-------------------|
-| User Authentication | ✅ Working | Instant login/signup, secure session management |
+| User Authentication | ✅ Working | NYU-only (@nyu.edu) login/signup, secure session management |
 | Create Listing | ✅ Working | Multi-image upload, form validation, <2s submission |
 | Browse Listings | ✅ Working | Grid view, <1s load time, smooth scrolling |
 | Search & Filter | ✅ Working | Real-time search, instant category filtering |
-| Listing Details | ✅ Working | Image gallery, seller contact, <1s load |
+| Listing Details | ✅ Working | Image gallery, seller contact (email/phone/WhatsApp), <1s load |
 | Edit Listing | ✅ Working | Pre-filled forms, image management |
-| Delete Listing | ✅ Working | Confirmation dialog, cascade deletes |
+| Delete Listing | ✅ Working | Confirmation dialog, soft delete with image cleanup; admin hard delete option |
 | My Listings | ✅ Working | Personal dashboard, status tracking |
 
 ### Advanced Features (100% Complete)
@@ -44,6 +44,7 @@ GiveNTake is a **fully functional, production-ready** student marketplace platfo
 | Settings Page | ✅ Working | Profile management, preferences |
 | Statistics Dashboard | ✅ Working | Real-time metrics including wishlist, interactive charts |
 | Safety Guidelines | ✅ Working | Transaction guide, safety tips |
+| Admin Moderation | ✅ Working | Admins can delete any listing (optional RLS policy enabled) |
 
 ### Technical Features (100% Complete)
 
@@ -54,7 +55,7 @@ GiveNTake is a **fully functional, production-ready** student marketplace platfo
 | Mobile Responsive | ✅ Working | Perfect on all screen sizes |
 | Tab Focus Refresh | ✅ Working | Auto-refresh when returning to tab |
 | Error Handling | ✅ Working | Toast notifications, helpful messages |
-| Type Safety | ✅ Complete | 100% TypeScript, zero errors |
+| Type Safety | ✅ Complete | TypeScript across codebase; strict types where applicable |
 
 ---
 
@@ -192,7 +193,7 @@ GiveNTake is a **fully functional, production-ready** student marketplace platfo
 | Category Filter | ✅ Pass | Shows correct category items |
 | Create Collection | ✅ Pass | Saves with title and description |
 | Create Wishlist | ✅ Pass | Posts wanted items |
-| Contact Seller | ✅ Pass | Email/phone links work |
+| Contact Seller | ✅ Pass | Email/phone/WhatsApp links work |
 | Mark Fulfilled | ✅ Pass | Updates wishlist status |
 
 ### Security Testing
@@ -235,6 +236,12 @@ GiveNTake is a **fully functional, production-ready** student marketplace platfo
 3. **Image Storage:**
    - 3 images max per listing
    - **Future:** Allow more images or video
+
+4. **Occasional Loading Spinner:**
+   - Rarely, the app may appear stuck on a loading screen.
+   - Refreshing the page resolves it (state rehydrates and background fetch completes).
+   - Likely causes: transient network hiccups during initial Supabase session fetch or a race during client boot.
+   - Current mitigations: background refresh on tab focus; auth safety timeout (5s) to avoid indefinite loading; non-blocking toasts on fetch errors.
 
 ### Planned Enhancements
 
@@ -413,5 +420,5 @@ GiveNTake is a **fully functional, production-ready** student marketplace platfo
 ---
 
 **Prepared for:** NYU Vibe Coding Hackathon  
-**Date:** October 15, 2025  
+**Date:** October 31, 2025  
 **Confidence Level:** Very High - All systems operational ✅
