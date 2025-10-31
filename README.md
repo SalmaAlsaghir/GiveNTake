@@ -179,13 +179,9 @@ GiveNTake/
 ## 📚 Documentation
 
 - **[QUICK_START.md](QUICK_START.md)** - Get started in 5 minutes ⚡
-- **[PLATFORM_COMPLETE_SUMMARY.md](PLATFORM_COMPLETE_SUMMARY.md)** - Complete feature list
-- **[PRE_LAUNCH_CHECKLIST.md](PRE_LAUNCH_CHECKLIST.md)** - Deployment checklist
 - **[SUPABASE_SETUP.md](SUPABASE_SETUP.md)** - Database setup guide
 - **[WISHLIST_SETUP.md](WISHLIST_SETUP.md)** - Wishlist feature guide
-- **[AI_IMPLEMENTATION_SUMMARY.md](AI_IMPLEMENTATION_SUMMARY.md)** - AI features
 - **[docs/blueprint.md](docs/blueprint.md)** - Project architecture
- - **[RUBRIC_ALIGNMENT.md](RUBRIC_ALIGNMENT.md)** - Evidence mapped to scoring categories
  - **[ACCESSIBILITY.md](ACCESSIBILITY.md)** - Accessibility and UX considerations
 
 ## 🤖 LLM Usage & Disclosure
