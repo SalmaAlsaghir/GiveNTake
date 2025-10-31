@@ -7,13 +7,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Mail, Phone, User, MapPin, Calendar, Tag } from "lucide-react";
+import { ArrowLeft, Mail, Phone, User, MapPin, Calendar, Tag, MessageCircle } from "lucide-react";
 import { ListingsService } from "@/lib/listings-service";
 import type { ListingWithImages } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/auth-context";
 import { Loader2, X, Edit3 } from "lucide-react";
 import Image from "next/image";
+import { isAdminEmail } from "@/lib/utils";
 
 const conditionTextMap: { [key: string]: string } = {
   "like-new": "Like-New",
@@ -32,6 +33,7 @@ export default function ListingDetailPage() {
   const router = useRouter();
   const { toast } = useToast();
   const { user } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
   const [listing, setListing] = useState<ListingWithImages | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -285,6 +287,16 @@ export default function ListingDetailPage() {
                     <Phone className="h-4 w-4 text-muted-foreground" />
                     <span className="text-sm text-muted-foreground">Phone:</span>
                     <span className="font-medium">{listing.profiles.phone_number}</span>
+                    <a
+                      href={`https://wa.me/${String(listing.profiles.phone_number).replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-2 inline-flex items-center gap-1 text-green-600 hover:text-green-700 hover:underline"
+                      aria-label="Contact via WhatsApp"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      WhatsApp
+                    </a>
                   </div>
                 )}
               </CardContent>
@@ -296,9 +308,9 @@ export default function ListingDetailPage() {
               <span>Posted on {new Date(listing.created_at).toLocaleDateString()}</span>
             </div>
 
-            {/* Edit Button for Owner */}
-            {user && listing.user_id === user.id && (
-              <div className="flex justify-end">
+            {/* Actions */}
+            <div className="flex justify-end gap-2">
+              {user && listing.user_id === user.id && (
                 <Button 
                   onClick={() => router.push(`/list/edit/${listing.id}`)}
                   className="flex items-center gap-2"
@@ -306,8 +318,28 @@ export default function ListingDetailPage() {
                   <Edit3 className="h-4 w-4" />
                   Edit Listing
                 </Button>
-              </div>
-            )}
+              )}
+              {isAdmin && (
+                <Button 
+                  variant="destructive"
+                  onClick={async () => {
+                    try {
+                      const { error } = await ListingsService.hardDeleteListing(listing.id);
+                      if (error) {
+                        toast({ variant: "destructive", title: "Delete failed", description: "Could not delete listing." });
+                        return;
+                      }
+                      toast({ title: "Listing deleted", description: "The listing has been removed." });
+                      router.back();
+                    } catch {
+                      toast({ variant: "destructive", title: "Delete failed", description: "Unexpected error." });
+                    }
+                  }}
+                >
+                  Delete
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>

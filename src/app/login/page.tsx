@@ -45,6 +45,18 @@ function LoginForm() {
     setIsLoading(true);
 
     try {
+      // Enforce @nyu.edu emails only
+      const email = (formData.email || "").trim().toLowerCase();
+      const domain = email.split("@").pop();
+      if (domain !== "nyu.edu") {
+        toast({
+          variant: "destructive",
+          title: "NYU Email Required",
+          description: "Please use your @nyu.edu email to log in.",
+        });
+        return;
+      }
+
       const { error } = await signIn(formData.email, formData.password);
       if (error) {
         toast({
@@ -87,7 +99,7 @@ function LoginForm() {
           </div>
           <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
           <CardDescription>
-            Enter your email below to login to your account
+            NYU email required (example: name@nyu.edu)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -97,7 +109,7 @@ function LoginForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="name@nyu.edu"
                 required
                 value={formData.email}
                 onChange={handleInputChange}

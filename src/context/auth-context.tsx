@@ -25,6 +25,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const ALLOWED_DOMAIN = 'nyu.edu';
+  const isAllowedEmail = (email?: string | null) => {
+    if (!email) return false;
+    const parts = email.trim().toLowerCase().split('@');
+    const domain = parts[1];
+    return domain === ALLOWED_DOMAIN;
+  };
 
   // Safety timeout to prevent infinite loading
   useEffect(() => {
@@ -109,6 +116,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('Initial session check:', session?.user?.email);
         
         if (session?.user) {
+          // Enforce domain restriction even if a session exists
+          if (!isAllowedEmail(session.user.email)) {
+            console.warn('Signing out - non-NYU email detected on initial session');
+            await supabase.auth.signOut();
+            setUser(null);
+            setProfile(null);
+            setIsAuthenticated(false);
+            return;
+          }
           setUser(session.user);
           setIsAuthenticated(true);
           await fetchProfile(session.user.id);
@@ -135,6 +151,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('Auth state changed:', event, session?.user?.email);
         
         if (session?.user) {
+          if (!isAllowedEmail(session.user.email)) {
+            console.warn('Signing out - non-NYU email detected on auth state change');
+            await supabase.auth.signOut();
+            setUser(null);
+            setProfile(null);
+            setIsAuthenticated(false);
+            setLoading(false);
+            return;
+          }
           setUser(session.user);
           setIsAuthenticated(true);
           await fetchProfile(session.user.id);
@@ -154,6 +179,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signUp = async (email: string, password: string, username: string, phone_number?: string) => {
     try {
       console.log('Signing up user:', email);
+      // Enforce domain restriction
+      if (!isAllowedEmail(email)) {
+        return { error: { message: 'Only @nyu.edu emails are allowed to sign up.' } };
+      }
       
       // 1. Create auth user with email confirmation disabled for development
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -200,6 +229,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signIn = async (email: string, password: string) => {
     try {
       console.log('Signing in user:', email);
+      // Enforce domain restriction
+      if (!isAllowedEmail(email)) {
+        return { error: { message: 'Only @nyu.edu emails are allowed to log in.' } } as { error: unknown };
+      }
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,

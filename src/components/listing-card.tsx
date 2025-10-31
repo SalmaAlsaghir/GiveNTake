@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Mail, Phone, Trash2, User, Edit3 } from "lucide-react";
+import { Mail, Phone, Trash2, User, Edit3, MessageCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -161,9 +161,22 @@ export function ListingCard({
                 <Mail className="h-3 w-3" />
                 <span>{listing.userEmail}</span>
             </div>
-             <div className="flex items-center gap-2">
-                <Phone className="h-3 w-3" />
-                <span>{listing.userPhone}</span>
+            <div className="flex items-center gap-2">
+              <Phone className="h-3 w-3" />
+              <span>{listing.userPhone}</span>
+              {listing.userPhone && (
+                <a
+                  href={`https://wa.me/${String(listing.userPhone).replace(/\D/g, "")}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-2 inline-flex items-center gap-1 text-green-600 hover:text-green-700 hover:underline"
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label="Contact via WhatsApp"
+                >
+                  <MessageCircle className="h-3 w-3" />
+                  WhatsApp
+                </a>
+              )}
             </div>
         </div>
         

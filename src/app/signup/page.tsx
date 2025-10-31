@@ -48,6 +48,17 @@ function SignupForm() {
     e.preventDefault();
     
     // Basic validation
+    const email = (formData.email || "").trim().toLowerCase();
+    const domain = email.split("@").pop();
+    if (domain !== "nyu.edu") {
+      toast({
+        variant: "destructive",
+        title: "NYU Email Required",
+        description: "Please use your @nyu.edu email to sign up.",
+      });
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         variant: "destructive",
@@ -208,7 +219,7 @@ function SignupForm() {
           </div>
           <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
           <CardDescription>
-            Join the community and start trading with fellow students.
+            Use your NYU email (example: name@nyu.edu)
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -228,7 +239,7 @@ function SignupForm() {
               <Input
                 id="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="name@nyu.edu"
                 required
                 value={formData.email ?? ""}
                 onChange={handleInputChange}

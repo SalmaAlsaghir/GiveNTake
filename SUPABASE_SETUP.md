@@ -308,6 +308,51 @@ npm install @supabase/supabase-js
 - All user data is automatically cleaned up when users are deleted
 - For production, always enable email verification
 
+### Optional: Admin Moderation (Delete Any Listing)
+
+To allow designated admins to delete any listing (not just their own), configure an admin email allowlist and add an RLS policy:
+
+1. Set a Postgres config variable with admin emails (comma-separated):
+
+```sql
+-- Replace with your admin emails
+select set_config('app.admin_emails', 'alice@nyu.edu,bob@nyu.edu', true);
+```
+
+2. Create a helper function to check if the current user is an admin:
+
+```sql
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+   select exists (
+      select 1
+      from public.profiles p
+      where p.id = auth.uid()
+         and lower(p.email) = any (string_to_array(lower(current_setting('app.admin_emails', true)), ','))
+   );
+$$;
+```
+
+3. Grant delete permission to admins on listings and their images:
+
+```sql
+-- Allow admins to delete any listing
+create policy if not exists "admin_can_delete_listings"
+on public.listings for delete
+using (public.is_admin());
+
+-- Allow admins to delete any listing image
+create policy if not exists "admin_can_delete_listing_images"
+on public.listing_images for delete
+using (public.is_admin());
+```
+
+With these policies, UI actions gated for admins will succeed server-side under RLS.
+
 ## Next Steps
 
 Once your backend is working:

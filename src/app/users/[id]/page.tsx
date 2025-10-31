@@ -16,6 +16,8 @@ import type { ListingWithImages } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { ListingCard } from "@/components/listing-card";
+import { useAuth } from "@/context/auth-context";
+import { isAdminEmail } from "@/lib/utils";
 
 const statusConfig = {
   available: {
@@ -41,6 +43,8 @@ const statusConfig = {
 export default function UserProfilePage() {
   const params = useParams();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [userListings, setUserListings] = useState<ListingWithImages[]>([]);
   const [userWishlist, setUserWishlist] = useState<any[]>([]);
@@ -106,6 +110,21 @@ export default function UserProfilePage() {
 
     loadUserData();
   }, [userId, toast]);
+
+  const handleAdminDelete = async (id: string) => {
+    try {
+      if (!isAdmin) return;
+      const { error } = await ListingsService.hardDeleteListing(id);
+      if (error) {
+        toast({ variant: "destructive", title: "Delete failed", description: "Could not delete listing." });
+        return;
+      }
+      setUserListings((prev) => prev.filter((l) => l.id !== id));
+      toast({ title: "Listing deleted", description: "The listing has been removed." });
+    } catch {
+      toast({ variant: "destructive", title: "Delete failed", description: "Unexpected error." });
+    }
+  };
 
   if (loading) {
     return (
@@ -359,6 +378,8 @@ export default function UserProfilePage() {
                       status: listing.status,
                     }}
                     showStatus
+                    showDelete={isAdmin}
+                    onDelete={handleAdminDelete}
                   />
                 ))}
               </div>

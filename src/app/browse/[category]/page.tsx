@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ListingsService } from "@/lib/listings-service";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/auth-context";
+import { isAdminEmail } from "@/lib/utils";
 
 interface BrowseCategoryPageProps {
     params: {
@@ -34,6 +36,8 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
                 : params;
         const { category } = usableParams;
     const { toast } = useToast();
+    const { user } = useAuth();
+    const isAdmin = isAdminEmail(user?.email);
     const categoryDisplayName = categoryDisplayNameMap[category] || decodeURIComponent(category).replace(/-/g, ' ');
 
     const [searchQuery, setSearchQuery] = useState("");
@@ -102,6 +106,22 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, [category]);
+
+    const handleAdminDelete = async (id: string) => {
+        try {
+            if (!isAdmin) return;
+            const { error } = await ListingsService.hardDeleteListing(id);
+            if (error) {
+                toast({ variant: "destructive", title: "Delete failed", description: "Could not delete listing." });
+                return;
+            }
+            setListings((prev) => prev.filter((l) => l.id !== id));
+            setFilteredListings((prev) => prev.filter((l) => l.id !== id));
+            toast({ title: "Listing deleted", description: "The listing has been removed." });
+        } catch {
+            toast({ variant: "destructive", title: "Delete failed", description: "Unexpected error." });
+        }
+    };
 
     useEffect(() => {
         const results = listings
@@ -183,6 +203,8 @@ export default function BrowseCategoryPage({ params }: BrowseCategoryPageProps) 
                                      collectionId: listing.collections?.id,
                                      collectionTitle: listing.collections?.title,
                                 }} 
+                                showDelete={isAdmin}
+                                onDelete={handleAdminDelete}
                             />
                         ))}
                     </div>

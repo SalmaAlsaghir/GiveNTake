@@ -9,14 +9,18 @@ import type { ListingWithImages } from "@/lib/types";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Frown } from "lucide-react";
 import { ListingsService } from "@/lib/listings-service";
+import { useAuth } from "@/context/auth-context";
+import { isAdminEmail } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 
 export default function BrowsePage() {
+  const { user } = useAuth();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
   const [listings, setListings] = useState<ListingWithImages[]>([]);
   const [filteredListings, setFilteredListings] = useState<ListingWithImages[]>([]);
   const [loading, setLoading] = useState(true);
+  const isAdmin = isAdminEmail(user?.email);
 
   useEffect(() => {
     let mounted = true;
@@ -90,6 +94,22 @@ export default function BrowsePage() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
+  const handleAdminDelete = async (id: string) => {
+    try {
+      if (!isAdmin) return; // double-guard
+      const { error } = await ListingsService.hardDeleteListing(id);
+      if (error) {
+        toast({ variant: "destructive", title: "Delete failed", description: "Could not delete listing." });
+        return;
+      }
+      setListings((prev) => prev.filter((l) => l.id !== id));
+      setFilteredListings((prev) => prev.filter((l) => l.id !== id));
+      toast({ title: "Listing deleted", description: "The listing has been removed." });
+    } catch {
+      toast({ variant: "destructive", title: "Delete failed", description: "Unexpected error." });
+    }
+  };
+
   if (loading) {
     return (
       <AppLayout>
@@ -159,6 +179,8 @@ export default function BrowsePage() {
                   collectionId: listing.collections?.id,
                   collectionTitle: listing.collections?.title,
                 }} 
+                showDelete={isAdmin}
+                onDelete={handleAdminDelete}
               />
             ))}
           </div>

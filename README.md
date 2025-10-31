@@ -33,7 +33,7 @@ A vibrant, student-friendly marketplace for NYU Abu Dhabi students. Buy, sell, a
 ## ✨ Features
 
 ### 🛍️ Marketplace
-- 🔐 **Secure Authentication** - Sign up/login with Supabase
+- 🔐 **Secure Authentication** - NYU-only sign up/login with Supabase (@nyu.edu enforced)
 - 📝 **Listing Management** - Create, edit, and manage your listings
 - 🖼️ **Multiple Images** - Upload up to 3 high-quality images per listing
 - 🤖 **AI-Powered Generation** - Auto-generate titles, descriptions, and categories from images
@@ -45,7 +45,7 @@ A vibrant, student-friendly marketplace for NYU Abu Dhabi students. Buy, sell, a
 ### ❤️ Wishlist (NEW!)
 - � **Post Wanted Items** - Let others know what you're looking for
 - 💰 **Budget Tracking** - Set your budget and preferred condition
-- 📞 **Direct Contact** - Email or call people who have what you need
+- 📞 **Direct Contact** - Email, call, or reach out via WhatsApp
 - ✅ **Fulfillment Status** - Mark items as found when completed
 
 ### 📚 Collections
@@ -57,6 +57,7 @@ A vibrant, student-friendly marketplace for NYU Abu Dhabi students. Buy, sell, a
 - 📈 **Statistics Dashboard** - View platform metrics including wishlist items
 - 👥 **User Profiles** - View listings, collections, and wishlist per user
 - 🛡️ **Safety Guidelines** - Learn how to transact safely
+- 🛠️ **Admin Moderation** - Admins can delete any listing
 - 🎨 **Modern UI** - Beautiful, student-friendly design with vibrant colors
 - 📱 **Fully Responsive** - Works perfectly on mobile, tablet, and desktop
 
@@ -232,6 +233,7 @@ NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 NEXT_PUBLIC_GOOGLE_API_KEY=your-google-ai-key (optional)
+NEXT_PUBLIC_ADMIN_EMAILS=alice@nyu.edu,bob@nyu.edu (optional; comma-separated)
 ```
 
 ## ♿ Accessibility & UX

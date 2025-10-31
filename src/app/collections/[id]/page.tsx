@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ListingCard } from "@/components/listing-card";
 import { Loader2, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/context/auth-context";
+import { isAdminEmail } from "@/lib/utils";
 
 type Collection = {
   id: string;
@@ -18,6 +20,8 @@ type Collection = {
 export default function CollectionDetailPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { user } = useAuth();
+  const isAdmin = isAdminEmail(user?.email);
   const [collection, setCollection] = useState<Collection | null>(null);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +52,17 @@ export default function CollectionDetailPage() {
       mounted = false;
     };
   }, [id]);
+
+  const handleAdminDelete = async (listingId: string) => {
+    try {
+      if (!isAdmin) return;
+      const { error } = await ListingsService.hardDeleteListing(listingId);
+      if (error) return;
+      setListings((prev) => prev.filter((l) => l.id !== listingId));
+    } catch {
+      // no-op
+    }
+  };
 
   // Reload collection and listings when the tab regains focus (without showing loading state)
   useEffect(() => {
@@ -135,6 +150,8 @@ export default function CollectionDetailPage() {
                   collectionId: listing.collections?.id,
                   collectionTitle: listing.collections?.title,
                 }}
+                showDelete={isAdmin}
+                onDelete={handleAdminDelete}
               />
             ))}
           </div>

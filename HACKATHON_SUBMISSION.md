@@ -1,4 +1,4 @@
-# NYU Vibe Coding Hackathon - Submission Package
+# NYU Vibe Coding Hackathon - Submission Package made by copilot
 
 ## 🎯 Project: GiveNTake - NYUAD Student Marketplace
 
